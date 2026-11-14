@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/requireAuth.js';
-import { createMenuItem, listMenu, updateMenuItem } from '../services/menuService.js';
+import { createMenuItem, getMenuItemDetail, listFeatured, listMenu, updateMenuItem } from '../services/menuService.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { badRequest } from '../utils/httpError.js';
 import { validateMenuItem } from '../utils/menuValidation.js';
@@ -16,11 +16,24 @@ function parseMenuItem(body) {
 // Public: only items customers can order (kiosk and cashier).
 router.get('/', asyncHandler(async (req, res) => res.json(await listMenu())));
 
+// Public: best sellers for the kiosk home page.
+router.get('/featured', asyncHandler(async (req, res) => res.json(await listFeatured())));
+
 // Manager: every item, including hidden ones.
 router.get(
   '/all',
   requireAuth,
   asyncHandler(async (req, res) => res.json(await listMenu({ includeUnavailable: true }))),
+);
+
+// Public: one drink with ingredients, allergens and a plain-language summary.
+router.get(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    const productId = Number.parseInt(req.params.id, 10);
+    if (!Number.isInteger(productId)) throw badRequest('Invalid menu item id');
+    res.json(await getMenuItemDetail(productId));
+  }),
 );
 
 router.post(
