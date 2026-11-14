@@ -1,32 +1,40 @@
-import { useRef } from 'react';
-import { formatMoney } from '../../utils/money';
+import { useState } from 'react';
+import { ALL_DRINKS } from '../../config/storeInfo';
+import DrinkCard from './DrinkCard';
 
 export default function DrinkBrowser({ products, categories, activeCategory, onCategoryChange, onSelect }) {
-  const gridRef = useRef(null);
-  const visible = products.filter((product) => product.category === activeCategory);
+  const [search, setSearch] = useState('');
+  const term = search.trim().toLowerCase();
+  const visible = products.filter((product) =>
+    (activeCategory === ALL_DRINKS || product.category === activeCategory)
+    && (!term || product.name.toLowerCase().includes(term)));
 
   return (
     <section aria-labelledby="browse-heading">
-      <h2 id="browse-heading" className="kiosk__heading">What are you craving?</h2>
-      <div className="category-tabs" role="group" aria-label="Drink categories">
-        {categories.map((category) => (
-          <button key={category} type="button" className="category-tab" aria-pressed={category === activeCategory}
-                  onClick={() => { onCategoryChange(category); gridRef.current?.scrollTo?.({ top: 0 }); }}>
-            {category}
-          </button>
-        ))}
-      </div>
-      <ul className="drink-grid" ref={gridRef} style={{ listStyle: 'none', padding: 0 }}>
-        {visible.map((product) => (
-          <li key={product.productId}>
-            <button type="button" className="drink-card" style={{ width: '100%', height: '100%' }}
-                    aria-label={`${product.name}, ${formatMoney(product.price)}`} onClick={() => onSelect(product)}>
-              <span className="drink-card__name">{product.name}</span>
-              <span className="drink-card__price">{formatMoney(product.price)}</span>
+      <h1 id="browse-heading" className="kiosk__heading">Our menu</h1>
+      <div className="menu-tools">
+        <div className="category-tabs" role="group" aria-label="Drink categories">
+          {[ALL_DRINKS, ...categories].map((category) => (
+            <button key={category} type="button" className="category-tab" aria-pressed={category === activeCategory}
+                    onClick={() => onCategoryChange(category)}>
+              {category}
             </button>
-          </li>
-        ))}
-      </ul>
+          ))}
+        </div>
+        <label className="search">
+          <span className="visually-hidden">Search drinks</span>
+          <input type="search" value={search} placeholder="Search drinks" onChange={(event) => setSearch(event.target.value)} />
+        </label>
+      </div>
+      {visible.length === 0
+        ? <p className="empty" role="status">No drinks match your search.</p>
+        : (
+          <ul className="drink-grid">
+            {visible.map((product) => (
+              <li key={product.productId}><DrinkCard product={product} onSelect={onSelect} /></li>
+            ))}
+          </ul>
+        )}
     </section>
   );
 }
