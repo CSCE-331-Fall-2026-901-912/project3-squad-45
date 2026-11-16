@@ -10,6 +10,23 @@ Texas A&M-themed bubble tea POS web app for CSCE 331 Project 3.
 | Customer Kiosk | `/kiosk` | Self-service ordering (touch, accessible) |
 | Kitchen Display | `/kitchen` | Live order tickets, manually completed |
 
+## Sprint 2 features (Customer Kiosk)
+| Feature | Where | Notes |
+|---|---|---|
+| Explore-first storefront (home, menu, drink detail, Flavor Quiz) | `client/src/views/kiosk/` | Kiosk is built from slots, see below |
+| Translation (Maria) | `client/src/i18n/`, `/api/translate` | Google Cloud Translation with a database cache and a boba glossary; "Simple words" mode |
+| Accessibility (Vishnu, Carol) | `client/src/styles/accessibility.css`, `hooks/useAccessibility.js` | High contrast, text size, larger buttons, more time, reduced motion |
+| Boba Spin game (beyond feature) | `views/kiosk/game/`, `/api/game` | Server-issued single-use discount codes |
+| Flavor Quiz (beyond feature) | `FlavorQuiz.jsx`, `/api/quiz` | Scores drinks by category and tag |
+| Weather picks | `home/WeatherSection.jsx`, `/api/weather` | Open-Meteo, no key needed |
+| Menu assistant | `overlays/ChatOverlay.jsx`, `/api/chat` | Anthropic Claude through a server proxy |
+
+**Kiosk slots.** Drop a file into `client/src/views/kiosk/providers/*Provider.jsx`, `toolbar/*Tool.jsx`, `home/*Section.jsx` or `overlays/*Overlay.jsx` and it appears on the kiosk with no other edits (see `kioskSlots.jsx`). Kiosk styles must use the `--k-*` color variables from `kiosk.css` so the high-contrast theme reaches them.
+
+**Settings.** Each server feature keeps its tunable values in `server/src/settings/<feature>.js`; client values live in `client/src/config/<feature>.js`.
+
+**Run migrations** after pulling Sprint 2 (`npm run migrate`). Render runs them on every deploy. New optional keys (`GOOGLE_TRANSLATE_API_KEY`, `ANTHROPIC_API_KEY`) are listed in `server/.env.example`; without them translation and chat show a friendly "unavailable" message.
+
 ## Structure
 - `client/` – React + Vite frontend. One folder per view in `src/views/`.
 - `server/` – Express API. `routes/` (HTTP), `services/` (business logic and SQL), `utils/` (pure helpers), `db/` (pool and migrations). Every `*.routes.js` file is auto-mounted at `/api/<name>`.

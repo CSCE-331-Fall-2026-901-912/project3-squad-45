@@ -3,7 +3,8 @@ services:
     name: reveille-brew-co
     runtime: node
     buildCommand: npm run render-build
-    startCommand: npm start
+    # Migrations are idempotent, so the new Sprint 2 tables and columns are created on every deploy.
+    startCommand: npm run migrate && npm start
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
@@ -24,3 +25,9 @@ services:
         generateValue: true
       - key: MANAGER_EMAILS
         value: reveille.bubbletea@gmail.com
+      - key: GOOGLE_TRANSLATE_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        value: claude-haiku-5-5
