@@ -1,0 +1,4 @@
+.weather { margin: 44px 0; padding: 28px; border: 2px solid var(--k-border); border-radius: 28px; background: var(--k-surface); }
+.weather__intro { display: flex; align-items: center; gap: 18px; margin-bottom: 20px; }
+.weather__icon { font-size: 3em; line-height: 1; }
+.weather__title { font-size: 1.6em; }
