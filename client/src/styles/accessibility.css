@@ -1,0 +1,76 @@
+/*
+ * Accessibility settings. The kiosk toolbar sets data attributes on <html>
+ * (see hooks/useAccessibility.js) and these rules respond to them.
+ */
+
+/* ---------- Text size (--a11y-text-scale is set from config/accessibility.js) ---------- */
+html[data-text-size] .kiosk { --kiosk-text-scale: var(--a11y-text-scale, 1); }
+
+/* ---------- High contrast: black background, yellow and white, 7:1 or better ---------- */
+html[data-contrast='high'] .kiosk {
+  --k-bg: #000000;
+  --k-surface: #000000;
+  --k-text: #ffffff;
+  --k-muted: #e6e6e6;
+  --k-primary: #ffe14d;
+  --k-on-primary: #000000;
+  --k-accent: #ffffff;
+  --k-on-accent: #000000;
+  --k-border: #ffffff;
+  --k-good: #7dff9b;
+  --k-warn: #ffb74d;
+  --k-danger: #ff8a80;
+  --k-hero-from: #000000;
+  --k-hero-to: #000000;
+}
+html[data-contrast='high'] .kiosk .hero,
+html[data-contrast='high'] .kiosk .welcome,
+html[data-contrast='high'] .kiosk .band { border: 3px solid #ffffff; }
+html[data-contrast='high'] .kiosk .hero,
+html[data-contrast='high'] .kiosk .welcome { color: #ffffff; }
+html[data-contrast='high'] .kiosk .drink-card,
+html[data-contrast='high'] .kiosk .category-tile,
+html[data-contrast='high'] .kiosk .chip { border: 2px solid #ffffff; box-shadow: none; }
+html[data-contrast='high'] .kiosk .badge { color: #000000; }
+html[data-contrast='high'] .kiosk .cart-pill__count { background: #000000; color: #ffe14d; }
+html[data-contrast='high'] .kiosk .site-header { background: #000000; color: #ffe14d; border-bottom: 3px solid #ffe14d; box-shadow: none; }
+html[data-contrast='high'] .kiosk .site-header__brand,
+html[data-contrast='high'] .kiosk .nav-link,
+html[data-contrast='high'] .kiosk .site-header__tools button,
+html[data-contrast='high'] .kiosk .site-header__tools select { background: #000000; color: #ffe14d; border-color: #ffe14d; }
+html[data-contrast='high'] .kiosk .nav-link[aria-current='page'],
+html[data-contrast='high'] .kiosk .site-header__tools button[aria-pressed='true'],
+html[data-contrast='high'] .kiosk .site-header__tools button[aria-expanded='true'] { background: #ffe14d; color: #000000; }
+html[data-contrast='high'] .kiosk .site-footer { border-top: 3px solid #ffe14d; background: #000000; color: #ffffff; }
+html[data-contrast='high'] :focus-visible { outline: 4px solid #00e5ff; outline-offset: 3px; }
+
+/* ---------- Larger buttons and spacing (hand tremor, limited fine motor control) ---------- */
+html[data-targets='large'] .kiosk button,
+html[data-targets='large'] .kiosk select,
+html[data-targets='large'] .kiosk input { min-height: 88px; min-width: 88px; }
+html[data-targets='large'] .kiosk .site-header__tools,
+html[data-targets='large'] .kiosk .site-header__nav,
+html[data-targets='large'] .kiosk .category-tabs,
+html[data-targets='large'] .kiosk .option-row,
+html[data-targets='large'] .kiosk .kiosk__actions { gap: 28px; }
+html[data-targets='large'] .kiosk .drink-grid,
+html[data-targets='large'] .kiosk .category-grid { gap: 32px; }
+
+/* ---------- Reduced motion ---------- */
+html[data-motion='reduced'] *, html[data-motion='reduced'] *::before, html[data-motion='reduced'] *::after {
+  animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important; scroll-behavior: auto !important;
+}
+
+/* ---------- Settings dialog ---------- */
+.a11y-dialog { width: min(34em, 92vw); padding: 24px; border: 4px solid var(--k-primary); border-radius: 24px; background: var(--k-surface); color: var(--k-text); font-size: 1em; }
+.a11y-dialog::backdrop { background: rgb(0 0 0 / 65%); }
+.a11y-dialog h2 { margin: 0 0 16px; font-size: 1.5em; }
+.kiosk .a11y-dialog button { min-height: 64px; padding: 0 22px; border: 3px solid var(--k-primary); border-radius: 18px; background: var(--k-surface); color: var(--k-primary); font-weight: 800; }
+.kiosk .a11y-dialog button:disabled { opacity: 0.4; }
+.a11y-dialog__row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; font-weight: 700; }
+.a11y-dialog__size { display: flex; gap: 12px; }
+.a11y-dialog__toggle { display: flex; align-items: center; width: 100%; justify-content: space-between; margin-bottom: 12px; }
+.kiosk .a11y-dialog .a11y-dialog__toggle[aria-pressed='true'] { background: var(--k-primary); color: var(--k-on-primary); }
+.a11y-dialog__actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; }
+.kiosk .a11y-dialog .a11y-dialog__done { background: var(--k-primary) !important; color: var(--k-on-primary) !important; }
