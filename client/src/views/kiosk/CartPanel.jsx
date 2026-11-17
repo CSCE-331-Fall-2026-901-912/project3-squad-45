@@ -18,10 +18,16 @@ export default function CartPanel({ cart, submitting, error, onCheckout }) {
           </li>
         ))}
       </ul>
+      {cart.discount && (
+        <p className="cart__discount" role="status">
+          <span>Boba Spin: {cart.discount.label} (−{formatMoney(cart.discountAmount)})</span>
+          <button type="button" className="cart__remove" onClick={cart.removeDiscount}>Remove discount</button>
+        </p>
+      )}
       {error && <p className="status status--error" role="alert">{error}</p>}
       <div className="cart__footer">
         <span className="cart__total">
-          {cart.itemCount} {cart.itemCount === 1 ? 'drink' : 'drinks'} · {formatMoney(cart.total)}
+          {cart.itemCount} {cart.itemCount === 1 ? 'drink' : 'drinks'} · {formatMoney(cart.payable)}
         </span>
         <button type="button" className="big-btn big-btn--primary" disabled={!cart.lines.length || submitting}
                 onClick={onCheckout}>
