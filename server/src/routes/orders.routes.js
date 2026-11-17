@@ -3,6 +3,7 @@ import { ORDERING } from '../config.js';
 import { placeOrder } from '../services/orderService.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { badRequest } from '../utils/httpError.js';
+import { normalizeCode } from '../utils/wheel.js';
 
 const router = Router();
 const VALID_SOURCES = Object.values(ORDERING.SOURCES);
@@ -19,7 +20,10 @@ router.post(
       : Number.parseInt(req.body.employeeId, 10);
     if (!Number.isInteger(employeeId)) throw badRequest('Cashier is required');
 
-    res.status(201).json(await placeOrder({ items, employeeId, source }));
+    // Only kiosk orders can redeem Boba Spin codes.
+    const discountCode = source === ORDERING.SOURCES.KIOSK ? normalizeCode(req.body.discountCode) || null : null;
+
+    res.status(201).json(await placeOrder({ items, employeeId, source, discountCode }));
   }),
 );
 

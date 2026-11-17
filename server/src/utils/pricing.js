@@ -46,3 +46,10 @@ export function validateOrderItems(items) {
   if (errors.length) throw badRequest('Invalid order', errors);
   return results.map((result) => result.value);
 }
+
+// Applies a percentage discount to an order subtotal.
+export function applyDiscount(subtotal, percent = 0) {
+  const clamped = Math.min(100, Math.max(0, percent));
+  const discountAmount = round2((subtotal * clamped) / 100);
+  return { discountAmount, total: round2(subtotal - discountAmount) };
+}

@@ -1,7 +1,8 @@
 import { ORDERING } from '../config.js';
 import { withTransaction } from '../db/pool.js';
 import { badRequest } from '../utils/httpError.js';
-import { orderTotal, unitPrice, validateOrderItems } from '../utils/pricing.js';
+import { applyDiscount, orderTotal, unitPrice, validateOrderItems } from '../utils/pricing.js';
+import { attachOrderToCode, claimDiscount } from './gameService.js';
 import { ORDER_EVENTS, publish } from './orderEvents.js';
 
 const ORDER_STATUS_OPEN = 'open';
@@ -45,7 +46,7 @@ async function calculateInventoryUse(client, lines) {
 
 // Writes the order, its items and the inventory deductions using `client`,
 // so callers control the transaction.
-export async function createOrder(client, { items, employeeId, source }) {
+export async function createOrder(client, { items, employeeId, source, discountCode = null }) {
   const requested = validateOrderItems(items);
   const prices = await loadPrices(client, [...new Set(requested.map((item) => item.productId))]);
   const missing = requested.find((item) => !prices.has(item.productId));
@@ -55,14 +56,19 @@ export async function createOrder(client, { items, employeeId, source }) {
     ...item,
     unitPrice: unitPrice(prices.get(item.productId), item.toppings.length),
   }));
-  const total = orderTotal(lines);
+  const subtotal = orderTotal(lines);
+  // Reports read total_cost, so it stores the amount actually charged.
+  const { discountAmount, total } = discountCode
+    ? applyDiscount(subtotal, await claimDiscount(client, discountCode))
+    : { discountAmount: 0, total: subtotal };
 
   const { rows: [order] } = await client.query(
-    `INSERT INTO orders (order_id, order_time, total_cost, employee_id, status, source)
-     VALUES (nextval('orders_order_id_seq'), now(), $1, $2, $3, $4)
+    `INSERT INTO orders (order_id, order_time, total_cost, employee_id, status, source, discount_code, discount_amount)
+     VALUES (nextval('orders_order_id_seq'), now(), $1, $2, $3, $4, $5, $6)
      RETURNING order_id`,
-    [total, employeeId, ORDER_STATUS_OPEN, source],
+    [total, employeeId, ORDER_STATUS_OPEN, source, discountCode, discountAmount],
   );
+  if (discountCode) await attachOrderToCode(client, discountCode, order.order_id);
 
   for (const line of lines) {
     await client.query(
@@ -82,7 +88,7 @@ export async function createOrder(client, { items, employeeId, source }) {
     );
   }
 
-  return { orderId: order.order_id, total };
+  return { orderId: order.order_id, total, discountAmount };
 }
 
 // Places an order atomically, then notifies the kitchen display.
