@@ -122,5 +122,7 @@ export const UI_DICTIONARY = {
     'Chilly out there. Try something creamy and comforting.': 'Hace frío. Prueba algo cremoso y reconfortante.',
     'It is hot in Aggieland. Cool off with something icy.': 'Hace calor en Aggieland. Refréscate con algo helado.',
     'Perfect weather for a fresh, classic tea.': 'Clima perfecto para un té clásico y fresco.',
+    'Weather is not available right now.': 'El clima no está disponible en este momento.',
+    'Try again': 'Intentar de nuevo',
   },
 };

@@ -2,3 +2,6 @@
 .weather__intro { display: flex; align-items: center; gap: 18px; margin-bottom: 20px; }
 .weather__icon { font-size: 3em; line-height: 1; }
 .weather__title { font-size: 1.6em; }
+.weather--unavailable { opacity: 0.85; }
+.weather__note { margin-top: 6px; }
+.weather__retry { font: inherit; text-decoration: underline; background: none; border: 0; padding: 0; cursor: pointer; color: inherit; }
