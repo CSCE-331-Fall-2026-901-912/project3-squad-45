@@ -55,6 +55,8 @@ export default function FlavorQuiz({ products, onSelectProduct, onBack }) {
   }
 
   const question = questions[step];
+  // Every question is answered and the matches are still loading.
+  if (!question) return <Loading />;
   return (
     <section className="quiz" aria-labelledby="quiz-heading">
       <p className="eyebrow">Question {step + 1} of {questions.length}</p>
