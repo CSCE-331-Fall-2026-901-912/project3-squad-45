@@ -24,7 +24,7 @@ services:
       - key: SESSION_SECRET
         generateValue: true
       - key: MANAGER_EMAILS
-        value: reveille.bubbletea@gmail.com
+        value: reveille.bubbletea@gmail.com,kavyaagar@tamu.edu
       - key: GOOGLE_TRANSLATE_API_KEY
         sync: false
       - key: ANTHROPIC_API_KEY
