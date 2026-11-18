@@ -5,7 +5,7 @@ import { listMenu } from './menuService.js';
 
 let cached = null;
 
-async function fetchCurrentWeather() {
+async function fetchOpenMeteo() {
   const params = new URLSearchParams({
     latitude: WEATHER.LATITUDE,
     longitude: WEATHER.LONGITUDE,
@@ -29,6 +29,48 @@ async function fetchCurrentWeather() {
   }
   const { current } = await response.json();
   return { temperatureF: Math.round(current.temperature_2m), weatherCode: current.weather_code };
+}
+
+// Fallback provider: US National Weather Service. Free, no key, but wants a User-Agent.
+let nwsHourlyUrl = null;
+
+async function nwsJson(url) {
+  const response = await fetch(url, {
+    headers: { 'User-Agent': 'reveille-brew-kiosk', Accept: 'application/geo+json' },
+    signal: AbortSignal.timeout(WEATHER.REQUEST_TIMEOUT_MS),
+  });
+  if (!response.ok) throw new HttpError(502, 'Weather service is unavailable', { upstreamStatus: response.status });
+  return response.json();
+}
+
+async function fetchNws() {
+  if (!nwsHourlyUrl) {
+    const point = await nwsJson(`${WEATHER.NWS_URL}/points/${WEATHER.LATITUDE},${WEATHER.LONGITUDE}`);
+    nwsHourlyUrl = point.properties.forecastHourly;
+  }
+  const { properties } = await nwsJson(nwsHourlyUrl);
+  const now = properties.periods[0];
+  const text = now.shortForecast;
+  // Map NWS wording onto the WMO codes the mood logic already understands.
+  let weatherCode = 0;
+  if (/snow|sleet|flurr|ice|freezing/i.test(text)) weatherCode = 73;
+  else if (/rain|shower|storm|drizzle/i.test(text)) weatherCode = 63;
+  const temperatureF = now.temperatureUnit === 'C' ? now.temperature * 1.8 + 32 : now.temperature;
+  return { temperatureF: Math.round(temperatureF), weatherCode };
+}
+
+async function fetchCurrentWeather() {
+  try {
+    return await fetchOpenMeteo();
+  } catch (primaryError) {
+    console.error('Open-Meteo failed, trying NWS:', primaryError.message, primaryError.details ?? '');
+    try {
+      return await fetchNws();
+    } catch (fallbackError) {
+      console.error('NWS failed:', fallbackError.message, fallbackError.details ?? '');
+      throw primaryError;
+    }
+  }
 }
 
 // Shared by every kiosk, so the forecast is fetched at most once per cache window.

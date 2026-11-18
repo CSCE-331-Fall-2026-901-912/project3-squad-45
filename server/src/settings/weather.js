@@ -1,6 +1,7 @@
 // Weather settings. The shop is in College Station, TX.
 export const WEATHER = {
   API_URL: 'https://api.open-meteo.com/v1/forecast',
+  NWS_URL: 'https://api.weather.gov',
   LATITUDE: 30.628,
   LONGITUDE: -96.3344,
   REQUEST_TIMEOUT_MS: 5_000,
