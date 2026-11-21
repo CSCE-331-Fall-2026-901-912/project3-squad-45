@@ -2,18 +2,21 @@ import { CHAT } from '../settings/chat.js';
 import { badRequest } from './httpError.js';
 
 export const SUGGEST_TOOL = {
-  name: 'suggest_drinks',
-  description: 'Show the customer drinks from the menu as tappable suggestions. Always also write a short text reply.',
-  input_schema: {
-    type: 'object',
-    properties: {
-      productIds: {
-        type: 'array',
-        items: { type: 'integer' },
-        description: `Menu product ids, at most ${CHAT.MAX_SUGGESTIONS}`,
+  type: 'function',
+  function: {
+    name: 'suggest_drinks',
+    description: 'Show the customer drinks from the menu as tappable suggestions. Always also write a short text reply.',
+    parameters: {
+      type: 'object',
+      properties: {
+        productIds: {
+          type: 'array',
+          items: { type: 'integer' },
+          description: `Menu product ids, at most ${CHAT.MAX_SUGGESTIONS}`,
+        },
       },
+      required: ['productIds'],
     },
-    required: ['productIds'],
   },
 };
 
@@ -56,17 +59,28 @@ export function sanitizeMessages(messages) {
 }
 
 // Pulls the text reply and the valid drink suggestions out of an API response.
+
+
+// Pulls the text reply and the valid drink suggestions out of an API response.
 export function extractReply(response, menu) {
-  const blocks = response.content ?? [];
-  const text = blocks.filter((block) => block.type === 'text').map((block) => block.text).join(' ').trim();
-  const requestedIds = blocks
-    .filter((block) => block.type === 'tool_use' && block.name === SUGGEST_TOOL.name)
-    .flatMap((block) => block.input?.productIds ?? []);
+  const message = response.choices?.[0]?.message ?? {};
+  // Some Nemotron variants leak <think> blocks into content; strip them.
+  const text = (message.content ?? '').replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+
+  const requestedIds = (message.tool_calls ?? [])
+    .filter((call) => call.function?.name === SUGGEST_TOOL.function.name)
+    .flatMap((call) => {
+      try { return JSON.parse(call.function.arguments).productIds ?? []; }
+      catch { return []; }
+    })
+    .map(Number);
+
   const byId = new Map(menu.map((item) => [item.productId, item]));
   const suggestions = [...new Set(requestedIds)]
     .filter((id) => byId.has(id))
     .slice(0, CHAT.MAX_SUGGESTIONS)
     .map((id) => byId.get(id));
+
   return {
     reply: text || (suggestions.length ? 'Here are some drinks you might like.' : 'Sorry, I could not find an answer. Could you ask another way?'),
     suggestions,
