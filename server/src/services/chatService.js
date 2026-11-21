@@ -15,18 +15,24 @@ export async function askAssistant(rawMessages, language) {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      'x-api-key': CHAT.API_KEY,
-      'anthropic-version': CHAT.API_VERSION,
+      authorization: `Bearer ${CHAT.API_KEY}`,
     },
     body: JSON.stringify({
       model: CHAT.MODEL,
       max_tokens: CHAT.MAX_TOKENS,
-      system: buildSystemPrompt(menu, ORDERING, language),
+      temperature: 0.4,
+      messages: [
+        { role: 'system', content: buildSystemPrompt(menu, ORDERING, language) },
+        ...messages,
+      ],
       tools: [SUGGEST_TOOL],
-      messages,
+      tool_choice: 'auto',
     }),
     signal: AbortSignal.timeout(CHAT.REQUEST_TIMEOUT_MS),
   });
-  if (!response.ok) throw new HttpError(502, 'The assistant could not answer. Please try again.');
+  if (!response.ok) {
+    console.error('Assistant API error', response.status, await response.text().catch(() => ''));
+    throw new HttpError(502, 'The assistant could not answer. Please try again.');
+  }
   return extractReply(await response.json(), menu);
 }
