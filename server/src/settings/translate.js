@@ -32,11 +32,23 @@ export const TRANSLATE = {
       'extra ice': 'más hielo',
       'no ice': 'sin hielo',
     },
-    vi: {
-      'tapioca pearls': 'trân châu',
-      'boba': 'trân châu',
-      'milk tea': 'trà sữa',
-      'slush': 'đá xay',
+    'zh-CN': {
+      'tapioca pearls': '珍珠',
+      'boba': '波霸',
+      'milk tea': '奶茶',
+      'slush': '冰沙',
+    },
+    ko: {
+      'tapioca pearls': '타피오카 펄',
+      'boba': '보바',
+      'milk tea': '밀크티',
+      'slush': '슬러시',
+    },
+    hi: {
+      'tapioca pearls': 'टैपिओका पर्ल्स',
+      'boba': 'बोबा',
+      'milk tea': 'मिल्क टी',
+      'slush': 'स्लश',
     },
   },
 };
