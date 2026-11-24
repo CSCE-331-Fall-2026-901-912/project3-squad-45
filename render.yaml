@@ -27,7 +27,7 @@ services:
         value: reveille.bubbletea@gmail.com,kavyaagar@tamu.edu
       - key: GOOGLE_TRANSLATE_API_KEY
         sync: false
-      - key: ANTHROPIC_API_KEY
+      - key: NVIDIA_API_KEY
         sync: false
-      - key: ANTHROPIC_MODEL
-        value: claude-haiku-5-5
+      - key: NVIDIA_MODEL
+        value: nvidia/nemotron-3-super-120b-a12b
