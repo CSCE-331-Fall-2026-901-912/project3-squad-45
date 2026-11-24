@@ -6,7 +6,7 @@ export default function SiteFooter() {
     <footer className="site-footer">
       <div>
         <p className="site-footer__brand" translate="no">{VENDOR_NAME}</p>
-        <p>{STORE_INFO.ADDRESS}</p>
+        <p translate="no">{STORE_INFO.ADDRESS}</p>
       </div>
       <div>
         <h2 className="site-footer__title">Hours</h2>

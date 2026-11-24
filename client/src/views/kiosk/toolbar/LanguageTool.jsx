@@ -3,8 +3,9 @@ import '../../../i18n/language.css';
 
 // Language picker and plain-language switch for the kiosk header.
 export default function LanguageTool() {
-  const { language, setLanguage, plain, setPlain, languages, enabled, status } = useTranslate();
+  const { language, setLanguage, plain, setPlain, languages, status } = useTranslate();
   if (languages.length === 0) return null;
+  const untranslated = language !== 'en' && status.error;
 
   return (
     <div className="language-tool">
@@ -19,9 +20,9 @@ export default function LanguageTool() {
       <button type="button" aria-pressed={plain} onClick={() => setPlain((on) => !on)}>Simple words</button>
       <span className="visually-hidden" role="status">
         {status.busy ? 'Translating…' : ''}
-        {status.error || (!enabled && language !== 'en') ? 'Some text could not be translated.' : ''}
+        {untranslated ? 'Some text could not be translated.' : ''}
       </span>
-      {(status.error || (!enabled && language !== 'en')) && (
+      {untranslated && (
         <span className="language-tool__warning" role="note">Some text is not translated</span>
       )}
     </div>
