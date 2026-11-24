@@ -11,7 +11,7 @@ export const TRANSLATE = {
     { code: 'en', label: 'English' },
     { code: 'es', label: 'Español' },
     { code: 'zh-CN', label: '中文' },
-    { code: 'vi', label: 'Tiếng Việt' },
+    { code: 'ko', label: '한국어' },
     { code: 'hi', label: 'हिन्दी' },
   ],
   // Brand and drink names that must never be translated.
