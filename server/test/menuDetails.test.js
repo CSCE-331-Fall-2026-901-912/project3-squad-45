@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { buildDetail, containsCaffeine, inferAllergens, isFoodItem } from '../src/utils/menuDetails.js';
+import { attachAllergens, buildDetail, containsCaffeine, inferAllergens, isFoodItem } from '../src/utils/menuDetails.js';
 
 const MILK_TEA = { productId: 1, name: 'Classic Milk Tea', category: 'Milk Tea', price: 5.5 };
 const RECIPE = [{ name: 'Milk' }, { name: 'Black Tea Leaves' }, { name: 'Simple Syrup' }, { name: 'Cups (24 oz)' }, { name: 'Straws' }];
@@ -35,4 +35,15 @@ test('buildDetail lists ingredients without supplies and writes a plain summary'
 test('plain summary says when a drink has no caffeine', () => {
   const detail = buildDetail({ ...MILK_TEA, name: 'Taro Slush', category: 'Slush' }, [{ name: 'Taro Powder' }]);
   assert.match(detail.plainDescription, /It has no caffeine\.$/);
+});
+
+test('attachAllergens adds allergens per product and ignores supplies', () => {
+  const rows = [
+    { productId: 1, name: 'Milk' },
+    { productId: 1, name: 'Straws' },
+    { productId: 2, name: 'Almond Syrup' },
+    { productId: 2, name: 'Mango Syrup' },
+  ];
+  const result = attachAllergens([{ productId: 1 }, { productId: 2 }, { productId: 3 }], rows);
+  assert.deepEqual(result.map((item) => item.allergens), [['Milk'], ['Tree nuts'], []]);
 });

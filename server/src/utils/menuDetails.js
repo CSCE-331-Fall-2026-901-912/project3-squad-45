@@ -16,6 +16,16 @@ export function inferAllergens(ingredientNames) {
     .map(([allergen]) => allergen);
 }
 
+// Adds an `allergens` list to each menu row from its recipe rows ({ productId, name }).
+export function attachAllergens(products, recipeRows) {
+  const byProduct = new Map();
+  for (const { productId, name } of recipeRows) {
+    if (!isFoodItem(name)) continue;
+    byProduct.set(productId, [...(byProduct.get(productId) ?? []), name]);
+  }
+  return products.map((product) => ({ ...product, allergens: inferAllergens(byProduct.get(product.productId) ?? []) }));
+}
+
 export const containsCaffeine = (ingredientNames) =>
   ingredientNames.some((name) => includesAny(name, MENU_DETAILS.CAFFEINE_KEYWORDS));
 

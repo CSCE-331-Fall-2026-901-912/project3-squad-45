@@ -7,6 +7,10 @@ export const MENU_DETAILS = {
   ALLERGEN_KEYWORDS: {
     Milk: ['milk', 'creamer'],
     Soy: ['soy'],
+    Egg: ['egg', 'pudding'],
+    Peanuts: ['peanut'],
+    'Tree nuts': ['almond', 'cashew', 'hazelnut', 'walnut', 'pistachio'],
+    Gluten: ['wheat', 'barley'],
   },
   CAFFEINE_KEYWORDS: ['tea leaves', 'matcha'],
   // Plain-language summaries stay short for readers who need simple wording.

@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { fetchQuiz, recommendDrinks } from '../../api/kioskApi';
 import { ErrorMessage, Loading } from '../../components/StatusMessage';
+import { useAllergenFilter } from '../../hooks/useAllergenFilter';
 import { useApi } from '../../hooks/useApi';
 import DrinkCard from './DrinkCard';
 
 export default function FlavorQuiz({ products, onSelectProduct, onBack }) {
   const quiz = useApi(fetchQuiz);
+  const { filter } = useAllergenFilter();
   const [answers, setAnswers] = useState({});
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
@@ -40,12 +42,13 @@ export default function FlavorQuiz({ products, onSelectProduct, onBack }) {
   }
 
   if (results) {
+    const safeResults = filter(results);
     return (
       <section aria-labelledby="quiz-heading">
         <h1 id="quiz-heading" className="kiosk__heading" tabIndex={-1} ref={headingRef}>Your matches</h1>
-        {results.length === 0
+        {safeResults.length === 0
           ? <p className="empty">We could not find a match. Try different answers.</p>
-          : <ul className="drink-grid">{results.map((product) => <li key={product.productId}><DrinkCard product={product} onSelect={onSelectProduct} /></li>)}</ul>}
+          : <ul className="drink-grid">{safeResults.map((product) => <li key={product.productId}><DrinkCard product={product} onSelect={onSelectProduct} /></li>)}</ul>}
         <div className="kiosk__actions">
           <button type="button" className="big-btn" onClick={restart}>Retake quiz</button>
           <button type="button" className="big-btn" onClick={onBack}>See the full menu</button>

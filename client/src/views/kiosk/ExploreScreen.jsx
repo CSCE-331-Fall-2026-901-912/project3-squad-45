@@ -1,6 +1,7 @@
 import { fetchFeatured } from '../../api/kioskApi';
 import { ErrorMessage, Loading } from '../../components/StatusMessage';
 import { STORE_INFO } from '../../config/storeInfo';
+import { useAllergenFilter } from '../../hooks/useAllergenFilter';
 import { useApi } from '../../hooks/useApi';
 import DrinkArt from './DrinkArt';
 import DrinkCard from './DrinkCard';
@@ -10,6 +11,7 @@ import { homeSections } from './kioskSlots';
 // Home page: hero, categories, feature sections from teammates, best sellers and the quiz.
 export default function ExploreScreen({ categories, slotProps, onBrowse, onQuiz, onSelectProduct }) {
   const featured = useApi(fetchFeatured);
+  const { filter } = useAllergenFilter();
 
   return (
     <div className="home">
@@ -49,7 +51,7 @@ export default function ExploreScreen({ categories, slotProps, onBrowse, onQuiz,
         {featured.loading && <Loading />}
         {featured.data && (
           <ul className="drink-grid">
-            {featured.data.map((product) => (
+            {filter(featured.data).map((product) => (
               <li key={product.productId}><DrinkCard product={product} onSelect={onSelectProduct} /></li>
             ))}
           </ul>

@@ -161,3 +161,6 @@
   .kiosk__main { padding: 20px 16px; }
   .site-footer { margin: 44px -16px -20px; }
 }
+
+.allergen-note { margin: 12px 0 0; font-size: 0.9em; color: var(--k-muted, var(--k-text)); }
+.filter-note { margin: 0 0 16px; font-weight: 600; }
