@@ -43,8 +43,11 @@ export class DomTranslator {
 
   configure({ language, plain }) {
     if (language === this.language && plain === this.plain) return;
+    const languageChanged = language !== this.language;
     this.language = language;
     this.plain = plain;
+    // A failure belongs to the language it happened in, so a new language starts clean.
+    if (languageChanged) this.onStatus({ busy: false, error: false });
     this.restoreAll();
     this.scan(this.root);
   }
@@ -119,7 +122,7 @@ export class DomTranslator {
   // undefined when it has been queued and will be applied by the next scan.
   translateValue(source) {
     const text = source.trim();
-    if (!isTranslatable(text)) return text;
+    if (!isTranslatable(text) || I18N.KEEP_AS_IS.includes(text)) return text;
     if (this.language === I18N.SOURCE_LANGUAGE) return text;
     const known = lookupDictionary(this.dictionaries, this.language, text) ?? this.cache.get(this.language)?.get(text);
     if (known !== undefined) return known;
@@ -144,10 +147,11 @@ export class DomTranslator {
         const translations = await this.fetchTranslations(language, batch);
         if (!this.cache.has(language)) this.cache.set(language, new Map());
         batch.forEach((text, index) => this.cache.get(language).set(text, translations[index]));
-        this.onStatus({ busy: this.inflight > 1, error: false });
+        if (language === this.language) this.onStatus({ busy: this.inflight > 1, error: false });
       } catch {
         batch.forEach((text) => this.failed.add(`${language}|${text}`));
-        this.onStatus({ busy: this.inflight > 1, error: true });
+        // Ignore failures from a language the customer has already left.
+        if (language === this.language) this.onStatus({ busy: this.inflight > 1, error: true });
       } finally {
         this.inflight -= 1;
       }
