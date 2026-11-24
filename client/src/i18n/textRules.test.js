@@ -25,5 +25,15 @@ test('lookupDictionary trims the text and returns undefined for unknown entries'
   const dictionaries = { es: { 'Place order': 'Hacer pedido' } };
   assert.equal(lookupDictionary(dictionaries, 'es', ' Place order '), 'Hacer pedido');
   assert.equal(lookupDictionary(dictionaries, 'es', 'Unknown'), undefined);
-  assert.equal(lookupDictionary(dictionaries, 'vi', 'Place order'), undefined);
+  assert.equal(lookupDictionary(dictionaries, 'ko', 'Place order'), undefined);
+});
+
+test('lookupDictionary fills templates and translates their slots', () => {
+  const dictionaries = {
+    es: { 'Remove {0}': 'Quitar {0}', 'Taro Milk Tea': 'Té de taro', Pudding: 'Flan', '({0})': '({0})' },
+  };
+  assert.equal(lookupDictionary(dictionaries, 'es', 'Remove Taro Milk Tea'), 'Quitar Té de taro');
+  assert.equal(lookupDictionary(dictionaries, 'es', 'Remove Unknown Drink'), 'Quitar Unknown Drink');
+  assert.equal(lookupDictionary(dictionaries, 'es', ' (Pudding, Pudding)'), '(Flan, Flan)');
+  assert.equal(lookupDictionary(dictionaries, 'es', 'Something else'), undefined);
 });
